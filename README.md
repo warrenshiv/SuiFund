@@ -1,100 +1,171 @@
-# Stim Games Platform: Module Documentation
+# SuiFund: Decentralized Scientific Research Funding Platform
 
-## Overview
+A blockchain-based platform that revolutionizes how scientific research is funded, validated, and monetized using the Sui Move ecosystem.
 
-This module, `stim_games::stim_games`, establishes a decentralized game store, enabling publishers to sell game licenses and users to buy, store, and view their purchased licenses. Additional features like promo codes, fee management, and a licensing verification mechanism are built in, providing a comprehensive structure for managing a blockchain-based game store.
+## Core Concept
 
-### Components
+Create a decentralized platform where:
+1. Researchers can propose studies and experiments
+2. Contributors can fund research through tokenized investments
+3. Research results and data become tradeable digital assets
+4. Peer review is incentivized and tokenized
+5. Research impact is tracked and rewarded
 
-#### Struct Definitions
+## Unique Technical Features
 
-1. **Platform**: Represents the game platform, with attributes for owner, fee percentage, and accumulated revenue.
+### 1. Dynamic Research Proposals
+- Multi-stage funding rounds with automated milestone releases
+- Proposal NFTs that evolve as research progresses
+- Built-in reproducibility verification system
+- Automated fund distribution based on milestone achievement
 
-2. **GameStore**: A container for games and promotional codes, with features for owner management.
+### 2. Innovative Funding Mechanisms
+- Quadratic funding for matching public goods research
+- Research-backed tokens that appreciate based on citation metrics
+- Option-like instruments for potential research applications
+- Cross-chain funding aggregation
 
-3. **Game**: Contains details of a game, including name, publisher, price, revenue, and a list of issued licenses.
+### 3. Decentralized Peer Review
+- Staking-based peer review system
+- Reputation tokens for reviewers
+- Automated detection of conflicts of interest
+- Zero-knowledge proofs for anonymous yet verifiable reviews
 
-4. **UserAccount**: Manages user-specific information such as balance and owned licenses.
+### 4. Research Impact Tracking
+- On-chain citation and reference tracking
+- Impact factor calculation using oracle networks
+- Automated royalty distribution for research derivatives
+- Real-time impact metrics using chainlink-style oracles
 
-5. **License**: Represents ownership of a purchased game, with details like purchase date and gifting information.
+## Technical Implementation Highlights
 
-6. **Discount**: Details for promotional codes, including discount rate, expiry, and usage tracking.
+```move
+// Example core structures
+struct ResearchProposal has key {
+    id: UID,
+    researcher: address,
+    title: String,
+    methodology: String,
+    milestones: vector<Milestone>,
+    funding_target: u64,
+    current_funding: u64,
+    stage: u8,
+    peer_reviews: Table<address, Review>,
+    impact_metrics: ImpactMetrics,
+    reproducibility_proofs: vector<ProofOfReproduction>
+}
 
-#### Error Codes
+struct Milestone has store {
+    description: String,
+    required_funding: u64,
+    deadline: u64,
+    verification_method: VerificationMethod,
+    status: MilestoneStatus,
+    validators: vector<address>
+}
 
-- **ENotOwner (0)**: Triggered when an action is attempted by a non-owner.
-- **EGameNotFound (1)**: Raised if a game is not found in the store.
-- **EUserNotFound (2)**: Raised when a user account is not found.
-- **EInsufficientFunds (3)**: Raised if the user lacks enough funds to purchase a license.
-- **EGameAlreadyExists (4)**: Raised when trying to add a game that already exists.
-- **EGameSoldOut (5)**: Raised when a game reaches its maximum licenses.
-- **EInvalidPromoCode (6)**: Raised if a promo code is invalid or expired.
+struct ImpactMetrics has store {
+    citations: u64,
+    industry_applications: u64,
+    derived_works: vector<ID>,
+    social_impact_score: u64,
+    commercial_value: u64
+}
+```
 
----
+## Novel Technical Challenges
 
-### Functions
+1. **Zero-Knowledge Peer Review System**
+   - Implement anonymous yet verifiable peer reviews
+   - Create proof systems for reviewer credentials
+   - Maintain reviewer privacy while ensuring accountability
 
-#### Platform and Store Management
+2. **Dynamic NFT Evolution**
+   - Research proposals as evolving NFTs
+   - Milestone-based metadata updates
+   - Automated value adjustment based on progress
 
-- **initialize_platform**: Initializes the platform with a set fee percentage for transactions. Only the platform owner can use this.
-  
-- **create_store**: Creates a game store for managing games and promotional codes. The sender of the transaction becomes the store owner.
+3. **Cross-Chain Impact Tracking**
+   - Monitor citations across multiple chains
+   - Aggregate impact metrics from various sources
+   - Implement cross-chain royalty distribution
 
-#### User Account Management
+4. **Quadratic Funding Implementation**
+   - Optimize gas costs for matching calculations
+   - Implement fair fund distribution algorithms
+   - Create efficient batch processing for contributions
 
-- **create_user_account**: Sets up a new user account for purchasing licenses.
+## Potential Extensions
 
-#### Game Management
+### 1. Research DAO Integration
+- Governance tokens for research direction
+- Community-driven funding priorities
+- Automated grant distribution
 
-- **add_game**: Allows store owners to add new games, specifying name, price, description, and optional max licenses.
+### 2. AI-Powered Analytics
+- Machine learning for proposal evaluation
+- Automated progress tracking
+- Fraud detection in research claims
 
-- **add_promo_code**: Enables store owners to add promotional codes with defined discounts and usage restrictions.
+### 3. Knowledge Graph Implementation
+- On-chain research relationship mapping
+- Automated discovery of research synergies
+- Impact prediction models
 
-#### License Purchase and Payment
+### 4. Industry Application Marketplace
+- Trading platform for research applications
+- License management system
+- Automated royalty distribution
 
-- **purchase_license**: Manages the purchase of a game license, including promo code application, fund deduction, platform fees, and license issuance. Licenses are only issued if sufficient funds are available, and the game is not sold out.
+## Why This Project Stands Out
 
-#### User Interaction
+1. **Technical Complexity**
+   - Advanced Move programming concepts
+   - Complex economic mechanisms
+   - Novel cryptographic implementations
 
-- **view_user_licenses**: Lists all licenses owned by the user.
+2. **Real-World Impact**
+   - Addresses actual problems in research funding
+   - Creates new opportunities for researchers
+   - Improves research transparency
 
-- **view_license**: Provides details of a specific license owned by the user.
+3. **Scalability**
+   - Can start small and grow
+   - Multiple extension possibilities
+   - Cross-chain potential
 
-#### Game Catalog
+4. **Portfolio Value**
+   - Demonstrates complex system design
+   - Shows understanding of DeFi mechanics
+   - Exhibits novel use of blockchain technology
 
-- **view_game_catalog**: Displays all games available for purchase. Filters out sold-out games if `max_licenses` is defined.
+## Development Phases
 
-#### License Verification and Revenue Withdrawal
+1. **Core Platform (MVP)**
+   - Basic proposal creation
+   - Simple funding mechanism
+   - Peer review system
 
-- **verify_license**: Allows for the verification of a user’s license by the license holder.
+2. **Advanced Features**
+   - Zero-knowledge reviews
+   - Dynamic NFTs
+   - Impact tracking
 
-- **withdraw_revenue**: Enables the game publisher to withdraw accumulated revenue for a particular game.
+3. **Ecosystem Integration**
+   - Cross-chain functionality
+   - Oracle implementation
+   - DAO governance
 
----
+4. **Scaling and Optimization**
+   - Gas optimization
+   - Performance improvements
+   - Security hardening
 
-### How to Use
-
-1. **Initialize Platform**: Set up the platform with a fee percentage, enabling revenue collection for game sales.
-
-2. **Create Store**: Owners create a store, which will manage the available games and promotional codes.
-
-3. **Add Games and Promo Codes**: Owners add games with prices and descriptions. Promo codes may be added to incentivize purchases.
-
-4. **User Registration**: Users create accounts to track their purchases and manage licenses.
-
-5. **Purchasing and Licensing**: Users purchase licenses, with promo codes if available. Platform fees are automatically deducted and transferred to the platform’s revenue.
-
-6. **License Verification**: Purchased licenses can be verified by the owner and store, ensuring authenticity and preventing unauthorized transfers.
-
-### Key Features
-
-- **Decentralized Ownership**: Owners have full control over store creation, game additions, and revenue withdrawal.
-- **Promotional Code System**: Promo codes offer users discounts, which store owners can configure with usage limits and expiration.
-- **Revenue Collection and Fee Management**: Platform fees are automatically collected on each purchase, providing a steady revenue stream for the platform.
-- **License Verification**: Verifiable licenses increase transparency and trust, ensuring that only legitimate users access purchased content.
-
-**Dependencies:**
-
-- This module requires the `sui` and `candid` crates for Sui blockchain interaction and data serialization.
-
-get more info at [dacade](https://dacade.org/communities/sui/challenges/19885730-fb83-477a-b95b-4ab265b61438/learning-modules/fc2e67a1-520d-4fae-a318-38414babc803)
+This project would demonstrate:
+- Advanced Move programming
+- Complex system architecture
+- Novel cryptographic implementations
+- Real-world problem solving
+- Understanding of academic/research processes
+- DeFi mechanism design
+- Cross-chain development
