@@ -1,26 +1,13 @@
 module suifund::research_platform {
-<<<<<<< HEAD
-    use sui::object::{Self, ID, UID};
-    use sui::transfer;
-    use sui::coin::{Self, Coin};
-    use sui::sui::SUI;
-    use sui::tx_context::{Self, TxContext};
-    use sui::table::{Self, Table};
-    use sui::linked_table::{Self, LinkedTable};
-    use sui::vec_map::{Self, VecMap};
-    use std::string::{Self, String};
-    use std::vector;
-    use std::option::{Self, Option};
-=======
-    use sui::coin::{Self, Coin};
-    use sui::sui::SUI;
-    use sui::table::{Self, Table};
-    use sui::linked_table::{Self, LinkedTable};
-    use sui::vec_map::{Self, VecMap};
-    use sui::balance::{Self, Balance}; 
-    use std::string::{String};
->>>>>>> master
 
+    use std::string::String;
+    use sui::balance::{Self, Balance};
+    use sui::coin::{Self, Coin};
+    use sui::linked_table::{Self, LinkedTable};
+    use sui::sui::SUI;
+    use sui::table::{Self, Table};
+    use sui::vec_map::{Self, VecMap};
+    
     // Error codes
     const ENotAuthorized: u64 = 0;
     const EInvalidAmount: u64 = 1;
@@ -31,39 +18,32 @@ module suifund::research_platform {
     const EInvalidProof: u64 = 6;
     const EProposalNotFound: u64 = 7;
     const EReviewerConflict: u64 = 8;
-
+    
     // Platform configuration constants
     const MIN_STAKE_AMOUNT: u64 = 1000;
     const MIN_FUNDING_AMOUNT: u64 = 100;
-<<<<<<< HEAD
-    const MAX_REVIEWERS: u64 = 5;
-=======
     // const MAX_REVIEWERS: u64 = 5;
->>>>>>> master
     const REVIEW_PERIOD: u64 = 7 * 24 * 60 * 60; // 7 days in seconds
-
+    
     // ======== Core Structs ========
-
-<<<<<<< HEAD
-    struct Platform has key {
-=======
+    
     public struct Platform has key {
->>>>>>> master
         id: UID,
         admin: address,
         treasury: Balance<SUI>,
         proposals: LinkedTable<ID, ResearchProposal>,
         researchers: Table<address, ResearcherProfile>,
         reviewers: Table<address, ReviewerProfile>,
-        governance_config: GovernanceConfig,
-        impact_metrics: GlobalMetrics
+        governance_config: Option<GovernanceConfig>,
+        impact_metrics: Option<GlobalMetrics>,
     }
 
-<<<<<<< HEAD
-    struct ResearchProposal has store {
-=======
+    public struct PlatformCap has key, store {
+        id: UID,
+        `for` : ID
+    }
+    
     public struct ResearchProposal has key, store {
->>>>>>> master
         id: UID,
         researcher: address,
         title: String,
@@ -77,61 +57,45 @@ module suifund::research_platform {
         timeline: Timeline,
         impact_metrics: ImpactMetrics,
         reproducibility_proofs: vector<ProofOfReproduction>,
-        metadata: VecMap<String, String>
+        metadata: VecMap<String, String>,
     }
-
-<<<<<<< HEAD
-    struct ResearcherProfile has store {
-=======
+    
     public struct ResearcherProfile has store {
->>>>>>> master
         reputation_score: u64,
         completed_projects: vector<ID>,
         active_projects: vector<ID>,
         total_funding_received: u64,
         citations: u64,
-        stake: Balance<SUI>
+        stake: Balance<SUI>,
     }
-
-<<<<<<< HEAD
-    struct ReviewerProfile has store {
-=======
+    
     public struct ReviewerProfile has store {
->>>>>>> master
         expertise_areas: vector<String>,
         reviews_completed: u64,
         stake: Balance<SUI>,
         reputation_score: u64,
-        review_quality_score: u64
+        review_quality_score: u64,
     }
-
-<<<<<<< HEAD
-    struct Milestone has store {
-=======
+    
     public struct ProofSubmission has store {
-    submitter: address,
-    timestamp: u64,
-    evidence_hash: vector<u8>,
-    metadata: VecMap<String, String>,
-    status: VerificationStatus
+        submitter: address,
+        timestamp: u64,
+        evidence_hash: vector<u8>,
+        metadata: VecMap<String, String>,
+        status: VerificationStatus,
     }
-
+    
     public struct Milestone has store {
->>>>>>> master
         description: String,
         required_funding: u64,
         deadline: u64,
         verification_method: VerificationMethod,
         status: MilestoneStatus,
         validators: vector<address>,
-        proof_submissions: vector<ProofSubmission>
+        proof_submissions: vector<ProofSubmission>,
     }
-
-<<<<<<< HEAD
-    struct Review has store {
-=======
+    
     public struct Review has store {
->>>>>>> master
         reviewer: address,
         timestamp: u64,
         score: u8,
@@ -140,110 +104,74 @@ module suifund::research_platform {
         feasibility_rating: u8,
         impact_rating: u8,
         stake_amount: u64,
-        verified: bool
+        verified: bool,
     }
-
-<<<<<<< HEAD
-    struct ProofOfReproduction has store {
-=======
+    
     public struct ProofOfReproduction has store {
->>>>>>> master
         validator: address,
         timestamp: u64,
         methodology_hash: vector<u8>,
         results_hash: vector<u8>,
         verification_data: vector<u8>,
-        status: VerificationStatus
+        status: VerificationStatus,
     }
-
-<<<<<<< HEAD
-    struct Timeline has store {
-=======
+    
     public struct Timeline has store {
->>>>>>> master
         created_at: u64,
         review_deadline: u64,
         funding_deadline: u64,
         estimated_completion: u64,
-        actual_completion: Option<u64>
+        actual_completion: Option<u64>,
     }
-
-<<<<<<< HEAD
-    struct ImpactMetrics has store {
-=======
+    
     public struct ImpactMetrics has store {
->>>>>>> master
         citations: u64,
         industry_applications: u64,
         derived_works: vector<ID>,
         social_impact_score: u64,
         commercial_value: u64,
-        reproducibility_score: u64
+        reproducibility_score: u64,
     }
-
-<<<<<<< HEAD
-    struct GlobalMetrics has store {
-=======
+    
     public struct GlobalMetrics has store {
->>>>>>> master
         total_proposals: u64,
         total_funding: u64,
         active_researchers: u64,
         successful_projects: u64,
         total_citations: u64,
-        platform_reputation: u64
+        platform_reputation: u64,
     }
-
-<<<<<<< HEAD
-    struct GovernanceConfig has store {
-=======
+    
     public struct GovernanceConfig has store {
->>>>>>> master
         min_stake_amount: u64,
         review_period: u64,
         fee_percentage: u64,
         quadratic_funding_pool: Balance<SUI>,
-        governance_token_supply: u64
+        governance_token_supply: u64,
     }
-
+    
     // ======== Enums ========
-
-<<<<<<< HEAD
-    struct ProposalStage has store {
-        value: u8
-    }
-
-    struct VerificationMethod has store {
-=======
+    
     public struct ProposalStage has store {
-        value: u8
+        value: u8,
     }
-
+    
     public struct VerificationMethod has store {
->>>>>>> master
         method_type: u8,
         required_proofs: u8,
-        verification_params: vector<u8>
+        verification_params: vector<u8>,
     }
-
-<<<<<<< HEAD
-    struct MilestoneStatus has store {
-        value: u8
-    }
-
-    struct VerificationStatus has store {
-=======
+    
     public struct MilestoneStatus has store {
-        value: u8
+        value: u8,
     }
-
+    
     public struct VerificationStatus has store {
->>>>>>> master
-        value: u8
+        value: u8,
     }
-
+    
     // ======== Core Functions ========
-
+    
     fun init(ctx: &mut TxContext) {
         let platform = Platform {
             id: object::new(ctx),
@@ -252,10 +180,24 @@ module suifund::research_platform {
             proposals: linked_table::new(ctx),
             researchers: table::new(ctx),
             reviewers: table::new(ctx),
-            governance_config: create_default_governance_config(ctx),
-            impact_metrics: create_default_metrics()
+            governance_config: option::none(),
+            impact_metrics: option::none(),
         };
+        let cap = PlatformCap{
+            id: object::new(ctx),
+            `for`: object::id(&platform)
+        };
+        transfer::public_transfer(cap, ctx.sender());
         transfer::share_object(platform);
+    }
+
+    public fun set_platform(self: &mut Platform, cap: &PlatformCap, ctx: &mut TxContext) {
+        assert!(object::id(self) == cap.`for`, EInvalidProof);
+        let governance_config = create_default_governance_config(ctx);
+        let impact_metrics = create_default_metrics();
+
+        option::fill(&mut self.governance_config, governance_config);
+        option::fill(&mut self.impact_metrics, impact_metrics);
     }
 
     public fun create_proposal(
@@ -266,13 +208,12 @@ module suifund::research_platform {
         funding_target: u64,
         milestones: vector<Milestone>,
         stake: Coin<SUI>,
-        ctx: &mut TxContext
+        ctx: &mut TxContext,
     ) {
         let researcher = tx_context::sender(ctx);
-        
         // Verify minimum stake
         assert!(coin::value(&stake) >= MIN_STAKE_AMOUNT, EInsufficientStake);
-        
+    
         let proposal = ResearchProposal {
             id: object::new(ctx),
             researcher,
@@ -287,50 +228,41 @@ module suifund::research_platform {
             timeline: create_timeline(ctx),
             impact_metrics: create_default_impact_metrics(),
             reproducibility_proofs: vector::empty(),
-            metadata: vec_map::empty()
+            metadata: vec_map::empty(),
         };
-
+    
         // Register researcher if not exists
         if (!table::contains(&platform.researchers, researcher)) {
             table::add(&mut platform.researchers, researcher, create_researcher_profile(stake, ctx));
+        } else {
+            let researcher_profile = table::borrow_mut(&mut platform.researchers, researcher);
+            balance::join(&mut researcher_profile.stake, coin::into_balance(stake));
         };
-
+    
         linked_table::push_back(&mut platform.proposals, object::id(&proposal), proposal);
     }
-
-<<<<<<< HEAD
-=======
+    
     public fun update_proposal(
-    platform: &mut Platform,
-    proposal_id: ID,
-    new_description: String,
-    ctx: &mut TxContext
+        platform: &mut Platform,
+        proposal_id: ID,
+        new_description: String,
+        ctx: &mut TxContext,
     ) {
         let proposal = linked_table::borrow_mut(&mut platform.proposals, proposal_id);
         let sender = tx_context::sender(ctx);
-        
+    
         // Only researcher who created the proposal or admin can update it
-        assert!(
-            sender == proposal.researcher || sender == platform.admin, 
-            ENotAuthorized
-        );
-        
+        assert!(sender == proposal.researcher || sender == platform.admin, ENotAuthorized);
+    
         proposal.description = new_description;
     }
-
-    public fun get_proposal_details(
-    platform: &Platform,
-    proposal_id: ID
-    ): &ResearchProposal {
-        assert!(
-            linked_table::contains(&platform.proposals, proposal_id),
-            EProposalNotFound
-        );
-        
+    
+    public fun get_proposal_details(platform: &Platform, proposal_id: ID): &ResearchProposal {
+        assert!(linked_table::contains(&platform.proposals, proposal_id), EProposalNotFound);
+    
         linked_table::borrow(&platform.proposals, proposal_id)
     }
-
->>>>>>> master
+    
     public fun submit_review(
         platform: &mut Platform,
         proposal_id: ID,
@@ -340,27 +272,24 @@ module suifund::research_platform {
         feasibility_rating: u8,
         impact_rating: u8,
         stake: Coin<SUI>,
-        ctx: &mut TxContext
+        ctx: &mut TxContext,
     ) {
         let reviewer = tx_context::sender(ctx);
-        let proposal = linked_table::borrow_mut(&mut platform.proposals, proposal_id);
-        
+        let proposal = linked_table::borrow(&platform.proposals, proposal_id);
+    
         // Verify reviewer eligibility and stake
         assert!(is_eligible_reviewer(platform, reviewer, proposal), EReviewerConflict);
         assert!(coin::value(&stake) >= MIN_STAKE_AMOUNT, EInsufficientStake);
-<<<<<<< HEAD
-=======
-
+    
         // Validate review scores are within acceptable range (e.g., 0-10)
         assert!(
             score <= 10 && 
-            methodology_rating <= 10 && 
-            feasibility_rating <= 10 && 
-            impact_rating <= 10,
-            EInvalidReview
+                methodology_rating <= 10 && 
+                feasibility_rating <= 10 && 
+                impact_rating <= 10,
+            EInvalidReview,
         );
->>>>>>> master
-        
+    
         let review = Review {
             reviewer,
             timestamp: tx_context::epoch(ctx),
@@ -370,158 +299,150 @@ module suifund::research_platform {
             feasibility_rating,
             impact_rating,
             stake_amount: coin::value(&stake),
-            verified: false
+            verified: false,
         };
 
-        table::add(&mut proposal.reviews, reviewer, review);
-        
+        let proposal2 = linked_table::borrow_mut(&mut platform.proposals, proposal_id);
+        table::add(&mut proposal2.reviews, reviewer, review);
+    
         // Update reviewer profile
         if (!table::contains(&platform.reviewers, reviewer)) {
             table::add(&mut platform.reviewers, reviewer, create_reviewer_profile(stake, ctx));
         } else {
             let reviewer_profile = table::borrow_mut(&mut platform.reviewers, reviewer);
             reviewer_profile.reviews_completed = reviewer_profile.reviews_completed + 1;
+            balance::join(&mut reviewer_profile.stake, coin::into_balance(stake));
         };
     }
-
+    
     public fun fund_proposal(
         platform: &mut Platform,
         proposal_id: ID,
         funding: Coin<SUI>,
-<<<<<<< HEAD
-        ctx: &mut TxContext
+        _ctx: &mut TxContext,
     ) {
-=======
-        _ctx: &mut TxContext
-    ) {
-        assert!(
-        linked_table::contains(&platform.proposals, proposal_id),
-        EProposalNotFound);
-
->>>>>>> master
+        assert!(linked_table::contains(&platform.proposals, proposal_id), EProposalNotFound);
+    
         let proposal = linked_table::borrow_mut(&mut platform.proposals, proposal_id);
         assert!(proposal.stage.value == 1, EInvalidState); // Must be in funding stage
-        
+    
         let amount = coin::value(&funding);
         assert!(amount >= MIN_FUNDING_AMOUNT, EInvalidAmount);
-        
+    
         // Calculate platform fee
-        let fee = amount * platform.governance_config.fee_percentage / 10000;
-        let funding_balance = coin::into_balance(funding);
+        let governence_config = option::borrow<GovernanceConfig>(&platform.governance_config);
+        let fee = amount * governence_config.fee_percentage / 10000;
+        let mut funding_balance = coin::into_balance(funding);
         let fee_balance = balance::split(&mut funding_balance, fee);
-        
+    
         // Add to platform treasury
         balance::join(&mut platform.treasury, fee_balance);
-        
+    
         // Add to proposal funding
         balance::join(&mut proposal.current_funding, funding_balance);
-        
+        let impact_metrics = option::borrow_mut<GlobalMetrics>(&mut platform.impact_metrics);
         // Update metrics
-        platform.impact_metrics.total_funding = 
-            platform.impact_metrics.total_funding + amount;
+        impact_metrics.total_funding = impact_metrics.total_funding + amount;
     }
-
+    
     public fun verify_milestone(
         platform: &mut Platform,
         proposal_id: ID,
         milestone_index: u64,
         proof: ProofOfReproduction,
-        ctx: &mut TxContext
+        ctx: &mut TxContext,
     ) {
-<<<<<<< HEAD
+        // Verify deadline has not passed
+        let current_time = tx_context::epoch(ctx);
         let proposal = linked_table::borrow_mut(&mut platform.proposals, proposal_id);
-        assert!(milestone_index < vector::length(&proposal.milestones), EInvalidMilestone);
-        
-        let milestone = vector::borrow_mut(&mut proposal.milestones, milestone_index);
-=======
+        let milestone = vector::borrow(&proposal.milestones, milestone_index);
+        assert!(current_time <= milestone.deadline, EInvalidState);
+
+        // Verify proof matches verification method
+        assert!(verify_proof_matches_method(&proof, &milestone.verification_method), EInvalidProof);
+
         // Verify proposal exists and get mutable reference
         assert!(linked_table::contains(&platform.proposals, proposal_id), EProposalNotFound);
         let proposal = linked_table::borrow_mut(&mut platform.proposals, proposal_id);
-        
+    
         // Verify milestone index is valid
         assert!(milestone_index < vector::length(&proposal.milestones), EInvalidMilestone);
-        
+    
         // Verify caller is an authorized validator
         let sender = tx_context::sender(ctx);
         let milestone = vector::borrow_mut(&mut proposal.milestones, milestone_index);
         assert!(vector::contains(&milestone.validators, &sender), ENotAuthorized);
-        
+    
         // Verify milestone is in progress
->>>>>>> master
         assert!(milestone.status.value == 1, EInvalidState); // Must be in progress
-        
+    
         // Verify proof
         assert!(verify_reproduction_proof(&proof), EInvalidProof);
-        
-<<<<<<< HEAD
-        vector::push_back(&mut proposal.reproducibility_proofs, proof);
-=======
+    
         // Record the proof
         vector::push_back(&mut proposal.reproducibility_proofs, proof);
-        
+    
         // Update milestone status
->>>>>>> master
         milestone.status.value = 2; // Completed
-        
+    
         // Release funding if available
         if (balance::value(&proposal.current_funding) >= milestone.required_funding) {
-<<<<<<< HEAD
-            // Implementation for funding release
-            // This would involve complex logic for fund distribution
-=======
             let amount_to_release = milestone.required_funding;
-            
+    
             // Split the required funding amount from the proposal's current funding
             let funding_to_release = balance::split(
-                &mut proposal.current_funding, 
-                amount_to_release
+                &mut proposal.current_funding,
+                amount_to_release,
             );
-            
+    
             // Get researcher profile
             let researcher_profile = table::borrow_mut(
-                &mut platform.researchers, 
-                proposal.researcher
+                &mut platform.researchers,
+                proposal.researcher,
             );
-            
+    
             // Update researcher metrics
-            researcher_profile.total_funding_received = 
+            researcher_profile.total_funding_received =
                 researcher_profile.total_funding_received + amount_to_release;
-                
+    
             // Create coin from balance and transfer to researcher
             let payment = coin::from_balance(funding_to_release, ctx);
             transfer::public_transfer(payment, proposal.researcher);
-            
+    
             // Update platform metrics
-            platform.impact_metrics.successful_projects = 
-                platform.impact_metrics.successful_projects + 1;
-                
+            let impact_metrics = option::borrow_mut<GlobalMetrics>(&mut platform.impact_metrics);
+
+            impact_metrics.successful_projects =
+                impact_metrics.successful_projects + 1;
+    
             // Check if this was the final milestone
-            let all_completed = true;
-            let i = 0;
+            let mut all_completed = true;
+            let mut i = 0;
             while (i < vector::length(&proposal.milestones)) {
                 let milestone = vector::borrow(&proposal.milestones, i);
-                if (milestone.status.value != 2) { // 2 = Completed
+                if (milestone.status.value != 2) {
+                    // 2 = Completed
                     all_completed = false;
                     break
                 };
                 i = i + 1;
             };
-            
+    
             // If all milestones are completed, mark the proposal as completed
             if (all_completed) {
                 proposal.stage.value = 3; // Completed stage
                 proposal.timeline.actual_completion = option::some(tx_context::epoch(ctx));
-                
+    
                 // Move project from active to completed in researcher's profile
                 let researcher_profile = table::borrow_mut(
-                    &mut platform.researchers, 
-                    proposal.researcher
+                    &mut platform.researchers,
+                    proposal.researcher,
                 );
-                
+    
                 let project_id = object::id(proposal);
-                
+    
                 // Remove from active projects
-                let i = 0;
+                let mut i = 0;
                 while (i < vector::length(&researcher_profile.active_projects)) {
                     if (vector::borrow(&researcher_profile.active_projects, i) == &project_id) {
                         vector::remove(&mut researcher_profile.active_projects, i);
@@ -529,30 +450,50 @@ module suifund::research_platform {
                     };
                     i = i + 1;
                 };
-                
+    
                 // Add to completed projects
                 vector::push_back(&mut researcher_profile.completed_projects, project_id);
             };
->>>>>>> master
         };
     }
-
+    
+    public fun submit_proof(
+        platform: &mut Platform,
+        proposal_id: ID,
+        milestone_index: u64,
+        evidence_hash: vector<u8>,
+        metadata: VecMap<String, String>,
+        ctx: &mut TxContext
+    ) {
+        let proposal = linked_table::borrow_mut(&mut platform.proposals, proposal_id);
+        
+        // Verify milestone index is valid
+        assert!(milestone_index < vector::length(&proposal.milestones), EInvalidMilestone);
+        
+        let proof = ProofSubmission {
+            submitter: tx_context::sender(ctx),
+            timestamp: tx_context::epoch(ctx),
+            evidence_hash,
+            metadata,
+            status: VerificationStatus { value: 0 }, // 0 = Pending
+        };
+        
+        let milestone = vector::borrow_mut(&mut proposal.milestones, milestone_index);
+        vector::push_back(&mut milestone.proof_submissions, proof);
+    }
+    
     // ======== Helper Functions ========
-
-<<<<<<< HEAD
-    fun create_default_governance_config(ctx: &mut TxContext): GovernanceConfig {
-=======
+    
     fun create_default_governance_config(_ctx: &mut TxContext): GovernanceConfig {
->>>>>>> master
         GovernanceConfig {
             min_stake_amount: MIN_STAKE_AMOUNT,
             review_period: REVIEW_PERIOD,
             fee_percentage: 250, // 2.5%
             quadratic_funding_pool: balance::zero(),
-            governance_token_supply: 1000000000
+            governance_token_supply: 1000000000,
         }
     }
-
+    
     fun create_default_metrics(): GlobalMetrics {
         GlobalMetrics {
             total_proposals: 0,
@@ -560,50 +501,59 @@ module suifund::research_platform {
             active_researchers: 0,
             successful_projects: 0,
             total_citations: 0,
-            platform_reputation: 0
+            platform_reputation: 0,
         }
     }
 
-<<<<<<< HEAD
-    fun create_researcher_profile(stake: Coin<SUI>, ctx: &mut TxContext): ResearcherProfile {
-=======
+    fun verify_proof_matches_method(proof: &ProofOfReproduction, method: &VerificationMethod): bool {
+        // Verify method type, required proofs, and verification parameters
+        proof.status.value <= method.required_proofs && 
+            verify_method_type(proof, method.method_type) &&
+            verify_parameters(proof, &method.verification_params)
+    }
+
+    fun verify_method_type(_proof: &ProofOfReproduction, _method_type: u8): bool {
+        // Implement method type verification logic here
+        true // Placeholder implementation
+    }
+    
+    fun verify_parameters(_proof: &ProofOfReproduction, _params: &vector<u8>): bool {
+        // Implement parameter verification logic here
+        true // Placeholder implementation
+    }
+    
     fun create_researcher_profile(stake: Coin<SUI>, _ctx: &mut TxContext): ResearcherProfile {
->>>>>>> master
         ResearcherProfile {
             reputation_score: 0,
             completed_projects: vector::empty(),
             active_projects: vector::empty(),
             total_funding_received: 0,
             citations: 0,
-            stake: coin::into_balance(stake)
+            stake: coin::into_balance(stake),
         }
     }
-
-<<<<<<< HEAD
-    fun create_reviewer_profile(stake: Coin<SUI>, ctx: &mut TxContext): ReviewerProfile {
-=======
+    
     fun create_reviewer_profile(stake: Coin<SUI>, _ctx: &mut TxContext): ReviewerProfile {
->>>>>>> master
         ReviewerProfile {
             expertise_areas: vector::empty(),
             reviews_completed: 0,
             stake: coin::into_balance(stake),
             reputation_score: 0,
-            review_quality_score: 0
+            review_quality_score: 0,
         }
     }
-
-    fun create_timeline(ctx: &mut TxContext): Timeline {
+    
+    fun create_timeline(ctx: &TxContext): Timeline {
         let now = tx_context::epoch(ctx);
         Timeline {
             created_at: now,
             review_deadline: now + REVIEW_PERIOD,
             funding_deadline: now + (2 * REVIEW_PERIOD),
             estimated_completion: now + (6 * REVIEW_PERIOD),
-            actual_completion: option::none()
+            actual_completion: option::none(),
         }
     }
-
+    
     fun create_default_impact_metrics(): ImpactMetrics {
         ImpactMetrics {
             citations: 0,
@@ -611,107 +561,103 @@ module suifund::research_platform {
             derived_works: vector::empty(),
             social_impact_score: 0,
             commercial_value: 0,
-            reproducibility_score: 0
+            reproducibility_score: 0,
         }
     }
-
+    
     fun is_eligible_reviewer(
         platform: &Platform,
         reviewer: address,
-        proposal: &ResearchProposal
+        proposal: &ResearchProposal,
     ): bool {
         reviewer != proposal.researcher &&
-        table::contains(&platform.reviewers, reviewer) &&
-        !table::contains(&proposal.reviews, reviewer)
+            table::contains(&platform.reviewers, reviewer) &&
+            !table::contains(&proposal.reviews, reviewer)
     }
-
+    
     fun verify_reproduction_proof(proof: &ProofOfReproduction): bool {
-<<<<<<< HEAD
-        // Implementation for verification logic
-        // This would involve cryptographic verification
-        true // Placeholder
-=======
         // Check proof timestamp is not zero
         assert!(proof.timestamp > 0, EInvalidProof);
-        
+    
         // Check that both methodology and results hashes are not empty
         assert!(!vector::is_empty(&proof.methodology_hash), EInvalidProof);
         assert!(!vector::is_empty(&proof.results_hash), EInvalidProof);
-        
+    
         // Verify the validator address is not zero address
         assert!(proof.validator != @0x0, EInvalidProof);
-        
+    
         // Verify the status is in a valid state (assuming 0 = pending, 1 = verified)
         assert!(proof.status.value <= 1, EInvalidProof);
-        
+    
         // Verify proof data existence
         assert!(!vector::is_empty(&proof.verification_data), EInvalidProof);
-        
+    
         // Verify data format and structure
         let valid_format = verify_data_format(&proof.verification_data);
         if (!valid_format) {
             return false
         };
-        
+    
         // Verify methodology hash matches expected format
         let valid_methodology = verify_hash_format(&proof.methodology_hash);
         if (!valid_methodology) {
             return false
         };
-        
+    
         // Verify results hash matches expected format
         let valid_results = verify_hash_format(&proof.results_hash);
         if (!valid_results) {
             return false
         };
-        
+    
         // Verify cryptographic proof
         // This would typically involve checking digital signatures or other cryptographic proofs
         let valid_crypto = verify_cryptographic_proof(
             &proof.methodology_hash,
             &proof.results_hash,
-            &proof.verification_data
+            &proof.verification_data,
         );
-        
+    
         valid_crypto
     }
-
+    
     // Helper function to verify the format of verification data
     fun verify_data_format(data: &vector<u8>): bool {
         // Minimum length check
         if (vector::length(data) < 32) {
             return false
         };
-        
+    
         // Check if data follows expected structure
         // This is a simplified example - adapt based on your specific data format
-        let valid = true;
-        let i = 0;
+        let mut valid = true;
+        let mut i = 0;
         let len = vector::length(data);
-        
+    
         while (i < len) {
             let byte = *vector::borrow(data, i);
             // Checking if certain positions contain expected markers
-            if (i == 0 && byte != 0x01) { // Example: first byte should be 0x01
+            if (i == 0 && byte != 0x01) {
+                // Example: first byte should be 0x01
                 valid = false;
                 break
             };
             i = i + 1;
         };
-        
+    
         valid
     }
-
+    
     // Helper function to verify hash format
     fun verify_hash_format(hash: &vector<u8>): bool {
         // Check hash length (assuming SHA-256 hash - 32 bytes)
         if (vector::length(hash) != 32) {
             return false
         };
-        
+    
         // Verify hash is not all zeros
-        let all_zeros = true;
-        let i = 0;
+        let mut all_zeros = true;
+        let mut i = 0;
         while (i < 32) {
             if (*vector::borrow(hash, i) != 0) {
                 all_zeros = false;
@@ -719,83 +665,88 @@ module suifund::research_platform {
             };
             i = i + 1;
         };
-        
+    
         !all_zeros
     }
-
+    
     // Helper function to verify cryptographic proof
     fun verify_cryptographic_proof(
         methodology_hash: &vector<u8>,
         results_hash: &vector<u8>,
-        verification_data: &vector<u8>
+        verification_data: &vector<u8>,
     ): bool {
         // Logic to verify the cryptographic proof
         // 1. Verify digital signatures
         // 2. Check hash chains
         // 3. Verify zero-knowledge proofs
         // 4. Check merkle proofs
-        
+    
         // Example implementation (simplified):
-        let valid = true;
-        
+        let mut valid = true;
+    
         // Verify methodology hash integrity
         if (!verify_hash_integrity(methodology_hash)) {
             valid = false;
         };
-        
+    
         // Verify results hash integrity
         if (!verify_hash_integrity(results_hash)) {
             valid = false;
         };
-        
+    
         // Verify data relationship
         if (!verify_hash_relationship(methodology_hash, results_hash, verification_data)) {
             valid = false;
         };
-        
+    
         valid
     }
-
+    
     // Helper function to verify hash integrity
     fun verify_hash_integrity(hash: &vector<u8>): bool {
         // Check if hash meets basic cryptographic properties
         if (vector::length(hash) != 32) {
             return false
         };
-        
+    
         // Check hash distribution (simplified)
-        let zero_count = 0;
-        let i = 0;
+        let mut zero_count = 0;
+        let mut i = 0;
         while (i < 32) {
             if (*vector::borrow(hash, i) == 0) {
                 zero_count = zero_count + 1;
             };
             i = i + 1;
         };
-        
+    
         // Arbitrary threshold for demonstration
         zero_count < 16
     }
-
+    
     // Helper function to verify relationship between hashes
     fun verify_hash_relationship(
         methodology_hash: &vector<u8>,
         results_hash: &vector<u8>,
-        verification_data: &vector<u8>
+        verification_data: &vector<u8>,
     ): bool {
         // Checking if results_hash can be derived from methodology_hash
         // using verification_data
-        
+    
         // Simplified example:
         let data_length = vector::length(verification_data);
         data_length >= 64 && // Minimum length to contain both hashes
-        vector::length(methodology_hash) == 32 &&
-        vector::length(results_hash) == 32
->>>>>>> master
+            vector::length(methodology_hash) == 32 &&
+            vector::length(results_hash) == 32
     }
-
+    
+    public fun get_milestone_description(milestone: &Milestone): String {
+        milestone.description
+    }
+    
     #[test_only]
     public fun init_for_testing(ctx: &mut TxContext) {
         init(ctx)
     }
+
 }
+    
